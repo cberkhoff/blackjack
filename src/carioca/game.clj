@@ -46,24 +46,6 @@ requires the names of the players"
 (player-hand the-game "imella")
 (dealer-hand the-game)
 
-(defn point-posibilities
-  [hand]
-  (letfn [(pp
-            [hand current branches]
-            (if (empty? hand)
-              branches
-              (let []
-                (if (number? current))
-              (let [next (first hand)
-                    r-hand (rest hand)
-                    next-branch (map #(+ % current) branches)]            
-                (if (= next :ace)
-                  (concat 
-                    (pp r-hand 1 next-branch)
-                    (pp r-hand 11 next-branch))
-                  (recur r-hand (if (number? next) next 10) next-branch))))))]
-         (pp hand (get (first hand) 0) [0])))
-
 (defn hand-points
   [hand]
   (let [v (map first hand)]
@@ -116,7 +98,7 @@ requires the names of the players"
 
 (hit the-game "imella")
 
-(player-dialog (dealer-hand the-game) 
+(play-dialog (dealer-hand the-game) 
                (player-hand the-game "imella") 
                "imella")
 
@@ -129,29 +111,35 @@ requires the names of the players"
                "imella"
                false)
 
+(dealer-dialog (dealer-hand the-game)) 
+
 (defn play-dealer-turn
   [game]
   (if (has-natural? (dealer-hand game))
     (for [player-name (human-players game)]
       (if (has-natural? (player-hand game player-name))
-        game
+        (do
+          (dealer-dialog (dealer-hand game))
+          game)
         (do 
           (busted-dialog (dealer-hand game)
-                       (player-hand game player-name)
-                       player-name
-                       false)
+                         (player-hand game player-name)
+                         player-name
+                         false)
           game)))
     (if (< (hand-points (dealer-hand game)) 17)
       (recur (hit game :dealer))
-      game
+      (do
+        (dealer-dialog (dealer-hand game))
+        game)
       )))
 
-(play-dealer-turn the-game)
+(play-dealer-turn (new-game))
 
 (defn play-player-turn
   [game player-name]
   (loop [game game]
-    (if (= (player-dialog (dealer-hand game)
+    (if (= (play-dialog (dealer-hand game)
                           (player-hand game player-name)
                           player-name)
            :hit)
