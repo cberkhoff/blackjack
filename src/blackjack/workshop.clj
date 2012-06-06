@@ -1,5 +1,5 @@
-(ns carioca.workshop
-  (:use [carioca.game :as g]))
+(ns blackjack.workshop
+  (:use [blackjack.game :as g]))
 
 ; Objetivo final
 ; ==============

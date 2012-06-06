@@ -1,6 +1,6 @@
-(ns carioca.game
+(ns blackjack.game
   (:use clojure.set
-        carioca.ui))
+        blackjack.ui))
 
 ; facil
 ; (pr suits)
@@ -79,7 +79,7 @@ requires the names of the players"
   [hand]
   (set (map first hand)))
 
-(hand-to-set (player-hand the-game "imella"))
+;(hand-to-set (player-hand the-game "imella"))
 
 ; medio
 ; let

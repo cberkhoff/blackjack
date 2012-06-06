@@ -1,4 +1,4 @@
-(ns carioca.ui
+(ns blackjack.ui
   (:use seesaw.core)
   (:import (javax.swing JFrame JLabel JButton)
            (java.io File)))
