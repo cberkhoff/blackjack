@@ -20,6 +20,8 @@
 (def deck
   (mapcat #(zipmap cards (repeat %)) suits))
 
+; (for [card g/cards suit g/suits] [card suit])
+
 ; dificil
 (defn new-game
   "Creates a hashmap with the state of a starting game. It
@@ -77,7 +79,7 @@ requires the names of the players"
   [hand]
   (set (map first hand)))
 
-;(hand-to-set (player-hand the-game "imella"))
+(hand-to-set (player-hand the-game "imella"))
 
 ; medio
 ; let
@@ -176,6 +178,7 @@ requires the names of the players"
                (zipmap (keys ps) (map hand-points (vals ps)))))))
 
 ; facil
+; se pueden sacar los parentesis :)
 (defn play-game
   [game]
   (-> game
