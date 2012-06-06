@@ -2,15 +2,25 @@
   (:use clojure.set
         carioca.ui))
 
+; facil
+; (pr suits)
 (def suits
   [:spades :hearts :diamonds :clubs])
 
+; facil
+; range
+; conj
 (def cards
   (conj (range 2 11) :ace :jack :queen :king))
 
+; medio
+; repeat
+; zipmap
+; mapcat
 (def deck
-  (mapcat #(into [] (zipmap cards (repeat %))) suits))
+  (mapcat #(zipmap cards (repeat %)) suits))
 
+; dificil
 (defn new-game
   "Creates a hashmap with the state of a starting game. It
 requires the names of the players"
@@ -22,29 +32,28 @@ requires the names of the players"
 	      {:pile (apply concat (nthrest pd n))
 	       :players (zipmap players (take n pd))})))) 
 
-(def the-game (new-game "nigro" "imella")) 
 
-(:players the-game)
-(:pile the-game)
 
+
+
+; medio
 (defn human-players
   [game]
   (filter string? (keys (:players game))))
 
-
-(human-players the-game)
-
+; facil
+; :keyword is fn
 (defn player-hand
   [game player-name]
   ((:players game) player-name))
 
+; facil
+; usar otra funcion
 (defn dealer-hand
   [game]
   (player-hand game :dealer))
 
-(player-hand the-game "imella")
-(dealer-hand the-game)
-
+; complejo
 (defn hand-points
   [hand]
   (let [v (map first hand)]
@@ -54,26 +63,36 @@ requires the names of the players"
         (let [base (+ easy-points n-aces)]
           (+ base (* 10 (min (quot (- 21 base) 10) n-aces))))))))        
 
-(hand-points [[:king] [2] [3] [4]]) ;19
-(hand-points [[:ace] [:ace] [:ace] [4]]) ;17
-(hand-points [[:ace] [:king] [3] [4]]) ;18
-(hand-points [[:ace] [4] [3] [4]]) ;12
-(hand-points [[:ace] [3] [3] [4]]) ;21
-(hand-points [[:ace] [:king] [:king] [:ace]]) ; 22
+;(hand-points [[:king] [2] [3] [4]]) ;19
+;(hand-points [[:ace] [:ace] [:ace] [4]]) ;17
+;(hand-points [[:ace] [:king] [3] [4]]) ;18
+;(hand-points [[:ace] [4] [3] [4]]) ;12
+;(hand-points [[:ace] [3] [3] [4]]) ;21
+;(hand-points [[:ace] [:king] [:king] [:ace]]) ; 22
 
+; medio
+; set
+; map
 (defn hand-to-set
   [hand]
   (set (map first hand)))
 
-(hand-to-set (player-hand the-game "imella"))
+;(hand-to-set (player-hand the-game "imella"))
 
+; medio
+; let
+; not-empty?
+; intersection
 (defn has-card
   [hand cards]
   (let [hand (hand-to-set hand)]
     (not-empty (intersection cards hand))))
 
-(has-card (player-hand the-game "imella") #{8})
+;(has-card (player-hand the-game "imella") #{8})
 
+; medio
+; when
+; and
 (defn has-natural?
   [hand]
   (when (and (= (count hand) 2)
@@ -81,37 +100,21 @@ requires the names of the players"
            (has-card hand #{:king :queen :jack 10}))
     hand))
 
-(has-natural? [[:ace :spades] [:king :spades] [:queen :hearts]])
-(has-natural? [[:ace :spades] [7 :spades] [3 :hearts]])
-(has-natural? [[:ace :spades] [10 :spades]])
-
+; facil
 (defn busted?
   [hand]
   (> (hand-points hand) 21))
 
+; complejo
+; update-in
 (defn hit
   [game player-name]
   (-> game
     (update-in [:pile] rest)
     (update-in [:players player-name] conj (first (:pile game)))))
 
-(hit the-game "imella")
 
-(play-dialog (dealer-hand the-game) 
-               (player-hand the-game "imella") 
-               "imella")
-
-(busted-dialog (dealer-hand the-game)
-               (player-hand the-game "imella") 
-               "imella")
-
-(busted-dialog (dealer-hand the-game)
-               (player-hand the-game "imella")
-               "imella"
-               false)
-
-(dealer-dialog (dealer-hand the-game)) 
-
+; complejo
 (defn play-dealer-turn
   [game]
   (if (has-natural? (dealer-hand game))
@@ -133,8 +136,9 @@ requires the names of the players"
         game)
       )))
 
-(play-dealer-turn (new-game))
+;(play-dealer-turn (new-game))
 
+; complejo
 (defn play-player-turn
   [game player-name]
   (loop [game game]
@@ -152,14 +156,16 @@ requires the names of the players"
           (recur next-game)))
       game)))
 
-(play-player-turn the-game "imella")
+;(play-player-turn the-game "imella")
 
+; facil (y bonito)
 (defn play-players-turns
   [game]
   (reduce play-player-turn game (human-players game)))
 
-(play-players-turns the-game)
+;(play-players-turns the-game)
 
+; complejo
 (defn scores
   [game]
   (map #(if (> (second %) 21)
@@ -169,14 +175,10 @@ requires the names of the players"
              (let [ps (:players game)]
                (zipmap (keys ps) (map hand-points (vals ps)))))))
 
-(scores the-game)
-
+; facil
 (defn play-game
   [game]
   (-> game
     (play-players-turns)
     (play-dealer-turn)
     (scores)))
-
-(play-game the-game)
-(play-game (new-game "clojure-boy" "dr-lazy" "mr-eager"))
