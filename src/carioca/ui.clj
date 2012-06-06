@@ -14,10 +14,17 @@
   [card]
   (icon (File. (str "resources" File/separator (card-to-file card) ".png"))))
 
+(defn user-label
+  [user-name]
+  (label :text user-name
+         :border 10
+         :foreground :white
+         :font {:name "ARIAL" :style :bold :size 14}))
+
 (defn card-label
   [card]
   (label :icon (card-icon card)
-         :border 10 ))
+         :border 10))
 
 (defn card-button
   [card]
@@ -42,14 +49,14 @@
     show!))
 
 (defn- player-dialog
-  [title dealer-hand player-hand actions hide-first-dealer-card]
+  [title dealer-hand player-name player-hand actions hide-first-dealer-card]
   (bj-dialog title 
              
                [(horizontal-panel 
-                   :items (player-hand-items dealer-hand hide-first-dealer-card)
+                   :items (cons (user-label "dealer") (player-hand-items dealer-hand hide-first-dealer-card)) 
                    :background "#A4A663")
                  (horizontal-panel 
-                   :items (player-hand-items player-hand false)
+                   :items (cons (user-label player-name) (player-hand-items player-hand false))
                    :background "#A4A663")
                  (horizontal-panel
                    :items actions
@@ -61,7 +68,7 @@
   [dealer-hand]
   (bj-dialog "Dealer's hand"
              [(horizontal-panel 
-                :items (player-hand-items dealer-hand false)
+                :items (cons (user-label "dealer") (player-hand-items dealer-hand false))
                 :background "#A4A663")
               (horizontal-panel
                 :items [(action :name "Ok" :handler #(return-from-dialog % :ok))]
@@ -74,8 +81,9 @@ busted button (returns :busted)."
     (busted-dialog dealer-hand player-hand player-name true))
   
   ([dealer-hand player-hand player-name hide-first-dealer-card]
-    (player-dialog (str player-name " busted!")
+    (player-dialog (str "Blackjack - " player-name " busted!")
                dealer-hand
+               player-name
                player-hand
                [(action :name "Busted!" :handler #(return-from-dialog % :busted))]
                hide-first-dealer-card)))
@@ -86,8 +94,9 @@ hit (returns :hit) and stand (returns :stand) button."
   [dealer-hand player-hand player-name]
   (let [hit-act (action :name "Hit" :handler (fn [e] (return-from-dialog e :hit)))
         stand-act (action :name "Stand" :handler (fn [e] (return-from-dialog e :stand)))]
-    (player-dialog (str "Blackjack " player-name)
+    (player-dialog (str "Blackjack - " player-name " turn")
                dealer-hand
+               player-name
                player-hand
                [hit-act stand-act]
                true)))

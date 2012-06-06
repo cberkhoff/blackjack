@@ -11,7 +11,6 @@
 (def deck
   (mapcat #(into [] (zipmap cards (repeat %))) suits))
 
-; implementar despues
 (defn new-game
   "Creates a hashmap with the state of a starting game. It
 requires the names of the players"
